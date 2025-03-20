@@ -26,8 +26,8 @@ def insert_data(vam_data):
         cursor = conn.cursor()
         insert_query = """
             INSERT INTO VAM_DATA 
-            ()
-            VALUES (%s, %s, %s, %s, %s)
+            (strDatetime,temp, eVOC, Co2)
+            VALUES (%s, %s, %s, %s)
         """
         values = (
             str(path_time_stamp),

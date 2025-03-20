@@ -17,7 +17,6 @@ DB_CONFIG = {
     "port": 3306  
 }
 
-
 def insert_data(vam_data):
     try:
         now = datetime.now()
@@ -26,7 +25,7 @@ def insert_data(vam_data):
         cursor = conn.cursor()
         insert_query = """
             INSERT INTO VAM_DATA 
-            (strDatetime,temp, eVOC, Co2)
+            (strDatetime, temp, eVOC, Co2)
             VALUES (%s, %s, %s, %s)
         """
         values = (
@@ -34,7 +33,7 @@ def insert_data(vam_data):
             float(vam_data[0]),
             float(vam_data[1]),
             float(vam_data[2])
-            )
+        )
         cursor.execute(insert_query, values)
         conn.commit()
     except mysql.connector.Error as e:
@@ -47,21 +46,32 @@ def insert_data(vam_data):
 def fetch_data_with_selenium():
     try:
         chrome_options = Options()
-        chrome_options.add_argument("--headless") 
-        service = Service('/opt/homebrew/bin/chromedriver')  
+        # Recommended for headless usage on Raspberry Pi
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--remote-debugging-port=9222")
+
+        # Specify binary location if necessary; often helpful on Raspberry Pi
+        chrome_options.binary_location = "/usr/bin/chromium-browser"
+
+        # Update the path to the ChromeDriver where it is installed on Raspberry Pi
+        service = Service('/usr/lib/chromium-browser/chromedriver')
+
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.get(URL_VAM)
+
         data_divs = driver.find_elements(By.CLASS_NAME, "dVal")
-        data_values = [float(div.text) for div in data_divs] 
+        data_values = [float(div.text) for div in data_divs]
 
         driver.quit()
         insert_data(data_values)
 
-
-        driver.quit()
     except Exception as e:
         print(f"Exception in fetch_data_with_selenium: {e}")
 
+# Fetch data once on start
 fetch_data_with_selenium()
 schedule.every(1).minutes.do(fetch_data_with_selenium)
 

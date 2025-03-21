@@ -10,11 +10,11 @@ import time
 URL_VAM = "http://172.31.76.171"
 
 DB_CONFIG = {
-    "host": "localhost",  
+    "host": "127.0.0.1",  
     "user": "root",
-    "password": "rootpassword",
-    "database": "mydatabase",
-    "port": 3306  
+    "password": "",
+    "database": "monitoring_tongdy",
+    # "port": 3306  
 }
 
 def insert_data(vam_data):
@@ -64,9 +64,9 @@ def fetch_data_with_selenium():
 
         data_divs = driver.find_elements(By.CLASS_NAME, "dVal")
         data_values = [float(div.text) for div in data_divs]
-
+        print(data_values)
         driver.quit()
-        insert_data(data_values)
+        # insert_data(data_values)
 
     except Exception as e:
         print(f"Exception in fetch_data_with_selenium: {e}")
@@ -76,7 +76,7 @@ fetch_data_with_selenium()
 schedule.every(1).minutes.do(fetch_data_with_selenium)
 
 if __name__ == "__main__":
-    print("Starting HTTP polling + MQTT service...")
+    print("Starting service...")
     while True:
         schedule.run_pending()
         time.sleep(1)

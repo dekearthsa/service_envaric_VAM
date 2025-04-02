@@ -9,12 +9,19 @@ import time
 
 URL_VAM = "http://172.31.76.171"
 
+# DB_CONFIG = {
+#     "host": "127.0.0.1",  
+#     "user": "root",
+#     "password": "",
+#     "database": "monitoring_tongdy",
+#     # "port": 3306  
+# }
+
 DB_CONFIG = {
-    "host": "127.0.0.1",  
     "user": "root",
     "password": "",
     "database": "monitoring_tongdy",
-    # "port": 3306  
+    "unix_socket": "/var/run/mysqld/mysqld.sock"
 }
 
 def insert_data(vam_data):
@@ -52,11 +59,8 @@ def fetch_data_with_selenium():
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--remote-debugging-port=9222")
-
-        # Specify binary location if necessary; often helpful on Raspberry Pi
         chrome_options.binary_location = "/usr/bin/chromium-browser"
 
-        # Update the path to the ChromeDriver where it is installed on Raspberry Pi
         service = Service('/usr/lib/chromium-browser/chromedriver')
 
         driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -64,9 +68,10 @@ def fetch_data_with_selenium():
 
         data_divs = driver.find_elements(By.CLASS_NAME, "dVal")
         data_values = [float(div.text) for div in data_divs]
+        ### debug ### 
         print(data_values)
         driver.quit()
-        # insert_data(data_values)
+        insert_data(data_values)
 
     except Exception as e:
         print(f"Exception in fetch_data_with_selenium: {e}")

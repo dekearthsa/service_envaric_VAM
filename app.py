@@ -25,6 +25,7 @@ DB_CONFIG = {
 }
 
 def insert_data(vam_data):
+    
     try:
         now = datetime.now()
         path_time_stamp = now.strftime("%d/%m/%y %H:%M:%S")
@@ -32,14 +33,14 @@ def insert_data(vam_data):
         cursor = conn.cursor()
         insert_query = """
             INSERT INTO VAM_DATA 
-            (strDatetime, temp, eVOC, Co2)
+            (strDatetime, temp, eVOC, co2)
             VALUES (%s, %s, %s, %s)
         """
         values = (
             str(path_time_stamp),
             float(vam_data[0]),
             float(vam_data[1]),
-            float(vam_data[2])
+            int(vam_data[2])
         )
         cursor.execute(insert_query, values)
         conn.commit()
@@ -71,7 +72,7 @@ def fetch_data_with_selenium():
         ### debug ### 
         print(data_values)
         driver.quit()
-        insert_data(data_values)
+        # insert_data(data_values)
 
     except Exception as e:
         print(f"Exception in fetch_data_with_selenium: {e}")
